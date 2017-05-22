@@ -26,6 +26,9 @@ const User = sequelize.define('users', {
   botuserid: Sequelize.STRING,
   botusername: Sequelize.STRING,
   deviceid: Sequelize.INTEGER
+},
+{
+  timestamps: false
 });
 
 const Device = sequelize.define('devices', {
@@ -35,17 +38,6 @@ const Device = sequelize.define('devices', {
 
 module.exports = function (context, myQueueItem) {
     context.log('JavaScript queue trigger function processed work item', myQueueItem);
-
-    // sequelize.sync()
-    // .then(() => User.create({
-    //     username: 'janedoe',
-    //     birthday: new Date(1980, 6, 20)
-    // }))
-    // .then(jane => {
-    //     console.log(jane.get({
-    //     plain: true
-    //     }));
-    // });
 
     var user = User.findAll({
         where: {
