@@ -17,6 +17,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "azure-storage": "^2.1.0"
+    "azure-storage": "^2.1.0",
+    "sequelize": "^3.30.4",
+    "tedious": "^2.0.0"
   }
 }
