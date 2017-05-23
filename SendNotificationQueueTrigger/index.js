@@ -1,5 +1,12 @@
 const Sequelize = require('sequelize');
 const DirectLine = require('./direct-line');
+const rp = require('request-promise');
+const Swagger = require('swagger-client');
+
+
+var directLineSecret = process.env.DIRECT_LINE_SECRET;
+var directLineClientName = 'DirectLineClient';
+var directLineSpecUrl = 'https://docs.botframework.com/en-us/restapi/directline3/swagger.json';
 
 const db = process.env.DB;
 const dbuser = process.env.DBUSER;
@@ -47,7 +54,51 @@ const Device = sequelize.define('devices', {
 module.exports = function (context, myQueueItem) {
     context.log('JavaScript queue trigger function processed work item', myQueueItem);
 
-    var directLine = new DirectLine(process.env.DIRECT_LINE_SECRET);
+    context.log('set client')
+
+    var directLineClient = rp(directLineSpecUrl)
+      .then(function (spec) {
+        // client
+        return new Swagger({
+            spec: JSON.parse(spec.trim()),
+            usePromise: true,
+            authorizations : {
+            AuthorizationBotConnector: new Swagger.ApiKeyAuthorization('Authorization', `Bearer ${directLineSecret}`, 'header'),
+          }
+        });
+    })
+    .catch(function (err) {
+        context.log('Error initializing DirectLine client', err);
+    });
+
+    directLineClient.then(function (client) {
+      context.log('start convo');
+      client.Conversations.Conversations_StartConversation()                          // create conversation
+        .then(function (response) {
+            context.log(response.obj.conversationId);
+            return response.obj.conversationId;
+        })                            // obtain id
+        .then(function (conversationId) {
+           context.log(conversationId);
+           context.log('post');
+
+           client.Conversations.Conversations_PostActivity(
+           {
+                conversationId: conversationId,
+                activity: {
+                    textFormat: 'plain',
+                    text: input,
+                    type: 'message',
+                    from: {
+                        id: directLineClientName,
+                        name: directLineClientName
+                    }
+                }
+            }).catch(function (err) {
+                context.log('Error sending message:', err);
+            });
+        });
+    });
 
     User.findAll({
         where: {
