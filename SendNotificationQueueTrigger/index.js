@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const DirectLine = require('./direct-line');
 
 const db = process.env.DB;
 const dbuser = process.env.DBUSER;
@@ -27,7 +28,8 @@ const User = sequelize.define('users', {
   serviceurl: { type: Sequelize.STRING },
   token: { type: Sequelize.STRING },
   conversationid: { type: Sequelize.STRING },
-  channelid: { type: Sequelize.STRING }
+  channelid: { type: Sequelize.STRING },
+  userid: { type: Sequelize.STRING }
 },
 {
   timestamps: false
@@ -44,6 +46,8 @@ const Device = sequelize.define('devices', {
 
 module.exports = function (context, myQueueItem) {
     context.log('JavaScript queue trigger function processed work item', myQueueItem);
+
+    var directLine = new DirectLine(process.env.DIRECT_LINE_SECRET);
 
     User.findAll({
         where: {
