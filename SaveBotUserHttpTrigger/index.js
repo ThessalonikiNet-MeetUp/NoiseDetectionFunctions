@@ -10,7 +10,7 @@ const sequelize = new Sequelize(db, dbuser, dbpwd, {
   pool: {
     max: 5,
     min: 0,
-    idle: 10000
+    idle: 5000
   },
   dialectOptions: {
     encrypt: true
@@ -46,22 +46,22 @@ module.exports = function (context, req) {
     var channelid = (req.query.ChannelId || req.body.ChannelId);
 
     if (userid && username && botid && botname && serviceurl) {
-        User.sync().then(() => {
-            User.create({
-                userid: userid,
-                username: username,
-                botid: botid,
-                botname: botname,
-                serviceurl: serviceurl,
-                token: token,
-                conversationid: conversationid,
-                channelid: channelid,
-            }).then(result => {
-                context.res = {
-                    status: 200,
-                    body: result.get('id')
-                };
-            });
+        User.create({
+            userid: userid,
+            username: username,
+            botid: botid,
+            botname: botname,
+            serviceurl: serviceurl,
+            token: token,
+            conversationid: conversationid,
+            channelid: channelid,
+        }).then(result => {
+            context.res = {
+                status: 200,
+                body: result.get('id')
+            };
+        }).catch(error => {
+            context.log(error);
         });
     } else {
         context.res = {
