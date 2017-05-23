@@ -49,10 +49,19 @@ module.exports = function (context, req) {
     var username = req.body.UserName;
     var botid = req.body.BotId;
     var botname = req.body.BotName;
-    var serviceurl = req.body.ServiceUrl;
-    var token = req.body.Token;
     var conversationid = req.body.ConversationId;
     var channelid = req.body.ChannelId;
+    var serviceurl = req.body.ServiceUrl;
+    var token = req.body.Token;
+
+    context.log(userid);
+    context.log(username);
+    context.log(botid);
+    context.log(botname);
+    context.log(conversationid);
+    context.log(channelid);
+    context.log(serviceurl);
+    context.log(token);
 
     if (!userid || !username || !botid || !botname || !serviceurl) {
         context.res = {
