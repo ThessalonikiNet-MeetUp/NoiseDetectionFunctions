@@ -17,5 +17,6 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "sequelize": "^3.30.4"
   }
 }
