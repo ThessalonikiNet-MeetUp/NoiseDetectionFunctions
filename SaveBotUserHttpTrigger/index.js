@@ -80,7 +80,8 @@ module.exports = function (context, req) {
         context.done();
     }).catch(error => {
         context.res = {
-            status: 500
+            status: 500,
+            body: error
         };
         context.log(error);
     });
