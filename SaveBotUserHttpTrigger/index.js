@@ -46,9 +46,8 @@ module.exports = function (context, req) {
     var channelid = (req.query.ChannelId || req.body.ChannelId);
 
     if (userid && username && botid && botname && serviceurl) {
-
         User.sync().then(() => {
-            return User.create({
+            User.create({
                 userid: userid,
                 username: username,
                 botid: botid,
@@ -57,6 +56,11 @@ module.exports = function (context, req) {
                 token: token,
                 conversationid: conversationid,
                 channelid: channelid,
+            }).then(result => {
+                context.res = {
+                    status: 200,
+                    body: result.get('id')
+                };
             });
         });
     } else {
