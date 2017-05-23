@@ -1,4 +1,4 @@
-const Sequelize = require('sequelize');
+import Sequelize  from 'sequelize';
 
 const db = process.env.DB;
 const dbuser = process.env.DBUSER;
