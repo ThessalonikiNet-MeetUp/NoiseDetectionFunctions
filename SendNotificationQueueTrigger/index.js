@@ -4,7 +4,7 @@ const DirectLine = require('./direct-line');
 const User = db.User;
 const Device = db.Device;
 
-var errorHandler = function(err) {
+var errorHandler = function(error) {
   context.log('error', error);
   context.done();
 }
@@ -25,7 +25,7 @@ module.exports = function (context, myQueueItem) {
       }
       var device = response.dataValues;
       if(device.user === null) {
-        errorHandler({source: 'f', message: 'user info could not be retrieve'});
+        errorHandler({source: 'f', message: 'user info could not be retrieved'});
       }
 
       context.log('user id', response.dataValues.user.id);
