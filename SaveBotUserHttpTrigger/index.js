@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-
 const db = process.env.DB;
 const dbuser = process.env.DBUSER;
 const dbpwd = process.env.DBPWD;

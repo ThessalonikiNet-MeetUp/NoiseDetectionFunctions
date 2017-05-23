@@ -17,6 +17,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "sequelize": "^3.30.4"
+    "sequelize": "^3.30.4",
+    "tedious": "^2.0.0"
   }
 }
