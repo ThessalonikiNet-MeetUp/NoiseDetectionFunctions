@@ -35,6 +35,7 @@ const User = sequelize.define('users', {
 
 module.exports = function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
+    context.log(req.body);
 
     if (!req.body) {
         context.res = {
@@ -45,14 +46,14 @@ module.exports = function (context, req) {
         return;
     }
 
-    var userid = req.body.UserId;
-    var username = req.body.UserName;
-    var botid = req.body.BotId;
-    var botname = req.body.BotName;
-    var conversationid = req.body.ConversationId;
-    var channelid = req.body.ChannelId;
-    var serviceurl = req.body.ServiceUrl;
-    var token = req.body.Token;
+    var userid = req.body.userId;
+    var username = req.body.userName;
+    var botid = req.body.botId;
+    var botname = req.body.botName;
+    var conversationid = req.body.conversationId;
+    var channelid = req.body.channelId;
+    var serviceurl = req.body.serviceUrl;
+    var token = req.body.token;
 
     context.log(userid);
     context.log(username);
