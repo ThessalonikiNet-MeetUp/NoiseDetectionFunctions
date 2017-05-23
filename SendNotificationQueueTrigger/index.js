@@ -1,116 +1,36 @@
-const Sequelize = require('sequelize');
+const db = require('./db');
 const DirectLine = require('./direct-line');
-const rp = require('request-promise');
-const Swagger = require('swagger-client');
 
-
-var directLineSecret = process.env.DIRECT_LINE_SECRET;
-var directLineClientName = 'DirectLineClient';
-var directLineSpecUrl = 'https://docs.botframework.com/en-us/restapi/directline3/swagger.json';
-
-const db = process.env.DB;
-const dbuser = process.env.DBUSER;
-const dbpwd = process.env.DBPWD;
-const dbhost = process.env.DBHOST;
-
-const sequelize = new Sequelize(db, dbuser, dbpwd, {
-  host: dbhost,
-  dialect: 'mssql',
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 10000
-  },
-  dialectOptions: {
-    encrypt: true
-  }
-});
-
-const User = sequelize.define('users', {
-  id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  email: { type: Sequelize.STRING },
-  name: { type: Sequelize.STRING },
-  botid: { type: Sequelize.STRING },
-  botname: { type: Sequelize.STRING },
-  serviceurl: { type: Sequelize.STRING },
-  token: { type: Sequelize.STRING },
-  conversationid: { type: Sequelize.STRING },
-  channelid: { type: Sequelize.STRING },
-  userid: { type: Sequelize.STRING }
-},
-{
-  timestamps: false
-});
-
-const Device = sequelize.define('devices', {
-  id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  name: { type: Sequelize.STRING },
-  userid: { type: Sequelize.INTEGER }
-},
-{
-  timestamps: false
-});
+const User = db.User;
+const Device = db.Device;
 
 module.exports = function (context, myQueueItem) {
-    context.log('JavaScript queue trigger function processed work item', myQueueItem);
 
-    context.log('set client')
+  context.log('JavaScript queue trigger function processed work item', myQueueItem);
 
-    var directLineClient = rp(directLineSpecUrl)
-      .then(function (spec) {
-        // client
-        return new Swagger({
-            spec: JSON.parse(spec.trim()),
-            usePromise: true,
-            authorizations : {
-            AuthorizationBotConnector: new Swagger.ApiKeyAuthorization('Authorization', `Bearer ${directLineSecret}`, 'header'),
-          }
-        });
-    })
-    .catch(function (err) {
-        context.log('Error initializing DirectLine client', err);
-    });
+  var directLine = new DirectLine(process.env.DIRECT_LINE_SECRET);
 
-    directLineClient.then(function (client) {
-      context.log('start convo');
-      client.Conversations.Conversations_StartConversation()                          // create conversation
-        .then(function (response) {
-            context.log(response.obj.conversationId);
-            return response.obj.conversationId;
-        })                            // obtain id
-        .then(function (conversationId) {
-           context.log(conversationId);
-           context.log('post');
+  var deviceID = myQueueItem.deviceID;
 
-           client.Conversations.Conversations_PostActivity(
-           {
-                conversationId: conversationId,
-                activity: {
-                    textFormat: 'plain',
-                    text: input,
-                    type: 'message',
-                    from: {
-                        id: directLineClientName,
-                        name: directLineClientName
-                    }
-                }
-            }).catch(function (err) {
-                context.log('Error sending message:', err);
-            });
-        });
-    });
+  Device.find({
+    where: {
+        id: deviceID
+    }, include: [User]}).then(function(response) {
+      if(response === null) {
+        context.log('error', {source: 'f', message: 'device not found'});
+        context.done();
+      }
+      var device = response.dataValues;
+      if(device.user === null) {
+        context.log('error', {source: 'f', message: 'user info could not be retrieved'});
+        context.done();
+      }
 
-    User.findAll({
-        where: {
-            email: 'ritazh@microsoft.com'
-        }
-    }).then(function(response) {
-      var user = response[0].dataValues;
-
-      context.log('result', user);
+      context.log('user id', response.dataValues.user.id);
       context.done();
+      
     }, function(error) {
-      context.log('error', error);
-      context.done();
+        context.log('error', error);
+        context.done();      
     });
 };

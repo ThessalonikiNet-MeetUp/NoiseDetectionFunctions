@@ -17,13 +17,6 @@
       "queueName": "ndbqueue",
       "connection": "ndbstorage_STORAGE",
       "direction": "out"
-    },
-    {
-      "type": "table",
-      "name": "ndbNotification",
-      "tableName": "ndbnotifications",
-      "connection": "ndbstorage_STORAGE",
-      "direction": "out"
     }
   ],
   "disabled": false
