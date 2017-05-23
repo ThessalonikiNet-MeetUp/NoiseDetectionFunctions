@@ -7,13 +7,17 @@ module.exports = function (context, req) {
         var deviceID = (req.query.deviceID || req.body.deviceID);
         var noiseLevel = (req.query.noiseLevel || req.body.noiseLevel);
 
-        context.bindings.nbdDeviceID = {
+        var queueItem = {
             deviceID: deviceID,
             noiseLevel: noiseLevel
         };
+
+        context.bindings.nbdDeviceID = queueItem;
+
+        context.log('queue', queueItem);
         
         context.res = {
-            // status: 200, /* Defaults to 200 */
+            status: 200,
             body: "All good"
         };
     }

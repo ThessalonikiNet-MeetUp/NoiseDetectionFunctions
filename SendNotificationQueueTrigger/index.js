@@ -44,7 +44,15 @@ module.exports = function (context, myQueueItem) {
       }
 
       context.log('user id', response.dataValues.user.id);
-      context.log('set client')
+
+      var botData = {};
+      botData.conversationId = response.dataValues.user.dataValues.conversationid;
+      botData.channelId = response.dataValues.user.dataValues.channelid;
+      botData.recipientId = response.dataValues.user.dataValues.userid;
+      botData.recipientName = response.dataValues.user.dataValues.name;
+      botData.serviceUrl = response.dataValues.user.dataValues.serviceurl;
+
+      context.log('set client', botData);
 
       directLineClient.then(function (client) {
         context.log('start convo');
@@ -62,7 +70,7 @@ module.exports = function (context, myQueueItem) {
                   conversationId: conversationId,
                   activity: {
                       textFormat: 'plain',
-                      text: "{'userid', '" + response.dataValues.user.id+ "'}",
+                      text: JSON.stringify(botData),
                       type: 'message',
                       from: {
                           id: directLineClientName,
@@ -74,6 +82,7 @@ module.exports = function (context, myQueueItem) {
               });
           });
       });
+
       context.done();
       
     }, function(error) {
