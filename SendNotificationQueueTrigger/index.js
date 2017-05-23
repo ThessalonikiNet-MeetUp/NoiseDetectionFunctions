@@ -6,11 +6,6 @@ const Device = db.Device;
 
 module.exports = function (context, myQueueItem) {
 
-  var errorHandler = function(error) {
-    context.log('error', error);
-    context.done();
-  }
-
   context.log('JavaScript queue trigger function processed work item', myQueueItem);
 
   var directLine = new DirectLine(process.env.DIRECT_LINE_SECRET);
@@ -22,15 +17,20 @@ module.exports = function (context, myQueueItem) {
         id: deviceID
     }, include: [User]}).then(function(response) {
       if(response === null) {
-        errorHandler({source: 'f', message: 'device not found'});
+        context.log('error', {source: 'f', message: 'device not found'});
+        context.done();
       }
       var device = response.dataValues;
       if(device.user === null) {
-        errorHandler({source: 'f', message: 'user info could not be retrieved'});
+        context.log('error', {source: 'f', message: 'user info could not be retrieved'});
+        context.done();
       }
 
       context.log('user id', response.dataValues.user.id);
-
       context.done();
-    }, errorHandler);
+      
+    }, function(error) {
+        context.log('error', error);
+        context.done();      
+    });
 };
