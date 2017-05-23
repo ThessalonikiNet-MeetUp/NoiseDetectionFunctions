@@ -4,12 +4,13 @@ const DirectLine = require('./direct-line');
 const User = db.User;
 const Device = db.Device;
 
-var errorHandler = function(error) {
-  context.log('error', error);
-  context.done();
-}
-
 module.exports = function (context, myQueueItem) {
+
+  var errorHandler = function(error) {
+    context.log('error', error);
+    context.done();
+  }
+
   context.log('JavaScript queue trigger function processed work item', myQueueItem);
 
   var directLine = new DirectLine(process.env.DIRECT_LINE_SECRET);
