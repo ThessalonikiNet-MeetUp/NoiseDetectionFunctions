@@ -60,7 +60,11 @@ module.exports = function (context, req) {
                 status: 200,
                 body: result.get('id')
             };
+            context.done();
         }).catch(error => {
+            context.res = {
+                status: 500
+            };
             context.log(error);
         });
     } else {
@@ -68,6 +72,6 @@ module.exports = function (context, req) {
             status: 400,
             body: "ID, Name, BotId, BotName, ServiceUrl, Token are requird on the query string or in the request body"
         };
+        context.done();
     }
-    context.done();
 };
