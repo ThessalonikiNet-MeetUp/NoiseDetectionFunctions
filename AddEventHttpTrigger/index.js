@@ -11,14 +11,6 @@ module.exports = function (context, req) {
             deviceID: deviceID,
             noiseLevel: noiseLevel
         };
-
-         context.bindings.ndbNotification = [];
-
-        context.bindings.ndbNotification.push({
-            PartitionKey: deviceID,
-            RowKey: (new Date).getTime().toString(),
-            NoiseLevel: noiseLevel
-        });
         
         context.res = {
             // status: 200, /* Defaults to 200 */
