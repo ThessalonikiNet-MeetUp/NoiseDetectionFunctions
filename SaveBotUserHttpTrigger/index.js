@@ -36,42 +36,52 @@ const User = sequelize.define('users', {
 module.exports = function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
 
-    var userid = (req.query.UserId || req.body.UserId);
-    var username = (req.query.UserName || req.body.UserName);
-    var botid = (req.query.BotId || req.body.BotId);
-    var botname = (req.query.BotName || req.body.BotName);
-    var serviceurl = (req.query.ServiceUrl || req.body.ServiceUrl);
-    var token = (req.query.token || req.body.token);
-    var conversationid = (req.query.ConversationId || req.body.ConversationId);
-    var channelid = (req.query.ChannelId || req.body.ChannelId);
+    if (!req.body) {
+        context.res = {
+            status: 400,
+            body: "Expected request body" 
+        };
+        context.done();
+        return;
+    }
 
-    if (userid && username && botid && botname && serviceurl) {
-        User.create({
-            userid: userid,
-            username: username,
-            botid: botid,
-            botname: botname,
-            serviceurl: serviceurl,
-            token: token,
-            conversationid: conversationid,
-            channelid: channelid,
-        }).then(result => {
-            context.res = {
-                status: 200,
-                body: result.get('id')
-            };
-            context.done();
-        }).catch(error => {
-            context.res = {
-                status: 500
-            };
-            context.log(error);
-        });
-    } else {
+    var userid = req.body.UserId;
+    var username = req.body.UserName;
+    var botid = req.body.BotId;
+    var botname = req.body.BotName;
+    var serviceurl = req.body.ServiceUrl;
+    var token = req.body.Token;
+    var conversationid = req.body.ConversationId;
+    var channelid = req.body.ChannelId;
+
+    if (!userid || !username || !botid || !botname || !serviceurl) {
         context.res = {
             status: 400,
             body: "ID, Name, BotId, BotName, ServiceUrl, Token are requird on the query string or in the request body"
         };
         context.done();
+        return;
     }
+
+    User.create({
+        userid: userid,
+        username: username,
+        botid: botid,
+        botname: botname,
+        serviceurl: serviceurl,
+        token: token,
+        conversationid: conversationid,
+        channelid: channelid,
+    }).then(result => {
+        context.res = {
+            status: 200,
+            body: result.get('id')
+        };
+        context.done();
+    }).catch(error => {
+        context.res = {
+            status: 500
+        };
+        context.log(error);
+    });
 };
