@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require('./db');
 const DirectLine = require('./direct-line');
 
 const User = db.User;
