@@ -30,9 +30,9 @@ function addUser(context, email, displayName, token, botid, botname, serviceurl,
 
   return User
       .findOrCreate({ where: { email: email }, defaults: { name: displayName, token: token } })
-      .spread((userResult, created) => {
-          userId = userResult.get('id');
-          username = userResult.get('name');
+      .spread((user, created) => {
+          userid = user.get('id');
+          username = user.get('name');
           if (!created) {
             return [200, username];
           } 
@@ -71,16 +71,16 @@ module.exports = function (context, req) {
     var serviceurl = req.body.serviceUrl;
     var token = req.body.token;
 
-    context.log(email);
-    context.log(displayName);
-    context.log(botuserid);
-    context.log(botusername);
-    context.log(botid);
-    context.log(botname);
-    context.log(conversationid);
-    context.log(channelid);
-    context.log(serviceurl);
-    context.log(token);
+    context.log("email: " + email);
+    context.log("displayName: " + displayName);
+    context.log("botuserid: " + botuserid);
+    context.log("botusername: " + botusername);
+    context.log("botid: " + botid);
+    context.log("botname: " + botname);
+    context.log("conversationId: " + conversationid);
+    context.log("channelId: " + channelid);
+    context.log("serviceurl: " + serviceurl);
+    //context.log(token);
 
     if (!email || !displayName || !botuserid || !botusername || !botid || !botname || !conversationid || !channelid || !serviceurl || !token) {
         context.res = {
