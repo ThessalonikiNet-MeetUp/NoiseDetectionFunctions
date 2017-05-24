@@ -53,12 +53,23 @@ module.exports = function (context, req) {
         token: token,
         conversationid: conversationid,
         channelid: channelid,
-    }).then(result => {
-        context.res = {
-            status: 200,
-            body: result.get('id')
-        };
-        context.done();
+    }).then(userResult => {
+        Device.create({
+          name: null,
+          userid: userResult.get('id'),
+        }).then(deviceResult => {
+          context.res = {
+              status: 200,
+              body: deviceResult.get('id')
+          };
+          context.done();
+        }).catch(error => {
+            context.res = {
+                status: 500,
+                body: error
+            };
+            context.log(error);
+        });
     }).catch(error => {
         context.res = {
             status: 500,
