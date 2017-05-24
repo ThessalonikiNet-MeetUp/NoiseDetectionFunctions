@@ -1,37 +1,6 @@
-const Sequelize = require('sequelize');
-const db = process.env.DB;
-const dbuser = process.env.DBUSER;
-const dbpwd = process.env.DBPWD;
-const dbhost = process.env.DBHOST;
-
-const sequelize = new Sequelize(db, dbuser, dbpwd, {
-  host: dbhost,
-  dialect: 'mssql',
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 5000
-  },
-  dialectOptions: {
-    encrypt: true
-  }
-});
-
-const User = sequelize.define('users', {
-  id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
-  email: Sequelize.STRING,
-  name: Sequelize.STRING,
-  botid: Sequelize.STRING,
-  botname: Sequelize.STRING,
-  serviceurl: Sequelize.STRING,
-  token: Sequelize.STRING,
-  conversationid: Sequelize.STRING,
-  channelid: Sequelize.STRING,
-  userid: Sequelize.STRING,
-},
-{
-  timestamps: false
-});
+const db = require('../SendNotificationQueueTrigger/db');
+const User = db.User;
+const Device = db.Device;
 
 module.exports = function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
@@ -45,7 +14,7 @@ module.exports = function (context, req) {
         context.done();
         return;
     }
-
+    var email = req.body.email;
     var userid = req.body.userId;
     var username = req.body.userName;
     var botid = req.body.botId;
@@ -55,6 +24,7 @@ module.exports = function (context, req) {
     var serviceurl = req.body.serviceUrl;
     var token = req.body.token;
 
+    context.log(email);
     context.log(userid);
     context.log(username);
     context.log(botid);
@@ -74,6 +44,7 @@ module.exports = function (context, req) {
     }
 
     User.create({
+        email: email,
         userid: userid,
         username: username,
         botid: botid,
