@@ -93,6 +93,7 @@ module.exports = function (context, req) {
 
     addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername)
         .then(result => {
+            console.log(result);
             context.res = {
                 status: result[0],
                 body: result[1] 
