@@ -27,16 +27,23 @@ function addBotUser(context, botid, botname, serviceurl, conversationid, channel
 
 function addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername){
   let userid;
-  return User.create({
-    email: email,
-    name: displayName,
-    token: token,
-  }).then(userResult => {
-      userid = userResult.get('id');
-      return addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername, userid);
-  }).then(addBotResult => {
-      return addDevice(context, userid);
-  })
+
+  return User
+      .findOrCreate({ where: { email: email }, defaults: { name: displayName, token: token } })
+      .spread((userResult, created) => {
+          userId = userResult.get('id');
+          username = userResult.get('name');
+          if (!created) {
+            return [200, username];
+          } 
+
+          return addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername, userid)
+            .then(() => {
+              return addDevice(context, userid)})
+            .then(deviceId => {
+              return [201, deviceId];
+            });
+    });
 }
 
 module.exports = function (context, req) {
@@ -79,17 +86,18 @@ module.exports = function (context, req) {
             status: 400,
             body: "missing params"
         };
+        context.log(context.res.status);
         context.done();
         return;
     }
 
     addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername)
-        .then(deviceId => {
+        .then(result => {
             context.res = {
-                status: 200,
-                body: deviceId
+                status: result[0],
+                body: result[1] 
             };
-            context.log(deviceId);
+            context.log(context.res.status);
             context.done();
         })
         .catch(error => {
@@ -97,6 +105,7 @@ module.exports = function (context, req) {
                 status: 500,
                 body: error
             };
+            context.log(context.res.status);
             context.log(error);
             context.done();
         });
