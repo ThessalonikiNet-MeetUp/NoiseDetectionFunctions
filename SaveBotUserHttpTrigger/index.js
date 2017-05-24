@@ -55,20 +55,21 @@ module.exports = function (context, req) {
             status: 400,
             body: "Expected request body" 
         };
+        context.log(context.res.status);
         context.done();
         return;
     }
 
-    var email = req.body.Email;
-    var displayName = req.body.DisplayName;
-    var botuserid = req.body.BotUserId;
-    var botusername = req.body.BotUserName;
-    var botid = req.body.BotId;
-    var botname = req.body.BotName;
-    var conversationid = req.body.ConversationId;
-    var channelid = req.body.ChannelId;
-    var serviceurl = req.body.ServiceUrl;
-    var token = req.body.Token;
+    var email = req.body.email;
+    var displayName = req.body.displayName;
+    var botuserid = req.body.botUserId;
+    var botusername = req.body.botUserName;
+    var botid = req.body.botId;
+    var botname = req.body.botName;
+    var conversationid = req.body.conversationId;
+    var channelid = req.body.channelId;
+    var serviceurl = req.body.serviceUrl;
+    var token = req.body.token;
 
     context.log(email);
     context.log(displayName);
@@ -81,7 +82,7 @@ module.exports = function (context, req) {
     context.log(serviceurl);
     context.log(token);
 
-    if (!email || !displayName || !botuserid || !botusername || !conversationid || !channelid || !serviceurl || !token) {
+    if (!email || !displayName || !botuserid || !botusername || !botid || !botname || !conversationid || !channelid || !serviceurl || !token) {
         context.res = {
             status: 400,
             body: "missing params"
