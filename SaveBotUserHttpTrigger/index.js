@@ -46,10 +46,10 @@ function addBotUser(context, botid, botname, serviceurl, conversationid, channel
 }
 
 
-function addUser(context, email, token, botid, botname, serviceurl, conversationid, channelid, botuserid){
+function addUser(context, displayName, email, token, botid, botname, serviceurl, conversationid, channelid, botuserid){
   User.create({
     email: email,
-    name: email,
+    name: displayName,
     token: token,
   }).then(userResult => {
       addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, userResult.get('id'));
@@ -75,7 +75,9 @@ module.exports = function (context, req) {
         context.done();
         return;
     }
+
     var email = req.body.email;
+    var displayName = req.body.displayName;
     var botuserid = req.body.botuserId;
     var username = req.body.userName;
     var botid = req.body.botId;
@@ -86,6 +88,7 @@ module.exports = function (context, req) {
     var token = req.body.token;
 
     context.log(email);
+    context.log(displayName);
     context.log(botuserid);
     context.log(username);
     context.log(botid);
@@ -104,5 +107,5 @@ module.exports = function (context, req) {
         return;
     }
 
-    addUser(context, email, token, botid, botname, serviceurl, conversationid, channelid, botuserid);
+    addUser(context, displayName, email, token, botid, botname, serviceurl, conversationid, channelid, botuserid);
 };
