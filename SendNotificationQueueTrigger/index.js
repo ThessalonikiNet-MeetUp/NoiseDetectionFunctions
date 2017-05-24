@@ -33,7 +33,7 @@ module.exports = function (context, myQueueItem) {
   Device.find({
     where: {
         id: deviceID
-    }, include: [User, BotInfo]}).then(function(response) {
+    }, include: [User]}).then(function(response) {
       if(response === null) {
         context.log('error', {source: 'f', message: 'device not found'});
         context.done();
@@ -58,6 +58,7 @@ module.exports = function (context, myQueueItem) {
       botData.recipientId = response.dataValues.botinfo.dataValues.userid;
       botData.recipientName = response.dataValues.user.dataValues.name;
       botData.serviceUrl = response.dataValues.botinfo.dataValues.serviceurl;
+      botData.token = response.dataValues.user.dataValues.token;
 
       context.log('set client', botData);
 
