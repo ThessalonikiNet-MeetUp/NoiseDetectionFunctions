@@ -4,26 +4,16 @@ const Device = db.Device;
 const BotInfo = db.BotInfo;
 
 function addDevice(context, userid){
-  Device.create({
+  return Device.create({
     name: null,
     userid: userid,
   }).then(deviceResult => {
-    context.res = {
-        status: 200,
-        body: deviceResult.get('id')
-    };
-    context.done();
-  }).catch(error => {
-      context.res = {
-          status: 500,
-          body: error
-      };
-      context.log(error);
+    return deviceResult.get('id');     
   });
 }
 
 function addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername, userid){
-  BotInfo.create({
+  return BotInfo.create({
     botid: botid,
     botname: botname,
     serviceurl: serviceurl,
@@ -32,35 +22,21 @@ function addBotUser(context, botid, botname, serviceurl, conversationid, channel
     botuserid, botuserid,
     botusername, botusername,
     userid, userid,
-  }).then(botinfoResult => {
-      context.res = {
-        status: 200
-    };
-    context.done();
-  }).catch(error => {
-      context.res = {
-          status: 500,
-          body: error
-      };
-      context.log(error);
   });
 }
 
 function addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername){
-  User.create({
+  let userid;
+  return User.create({
     email: email,
     name: displayName,
     token: token,
   }).then(userResult => {
-      addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername, userResult.get('id'));
-      addDevice(context, userResult.get('id'));
-  }).catch(error => {
-      context.res = {
-          status: 500,
-          body: error
-      };
-      context.log(error);
-  });
+      userid = userResult.get('id');
+      return addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername, userid);
+  }).then(addBotResult => {
+      return addDevice(context, userid);
+  })
 }
 
 module.exports = function (context, req) {
@@ -107,5 +83,21 @@ module.exports = function (context, req) {
         return;
     }
 
-    addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername);
+    addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername)
+        .then(deviceId => {
+            context.res = {
+                status: 200,
+                body: deviceId
+            };
+            context.log(deviceId);
+            context.done();
+        })
+        .catch(error => {
+            context.res = {
+                status: 500,
+                body: error
+            };
+            context.log(error);
+            context.done();
+        });
 };
