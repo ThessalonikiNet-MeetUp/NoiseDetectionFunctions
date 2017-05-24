@@ -35,7 +35,8 @@ const BotInfo = sequelize.define('botinfo', {
   conversationid: { type: Sequelize.STRING },
   channelid: { type: Sequelize.STRING },
   botuserid: { type: Sequelize.STRING },
-  userid: { type: Sequelize.STRING }
+  userid: { type: Sequelize.STRING },
+  botusername: { type: Sequelize.STRING },
 },
 {
   timestamps: false

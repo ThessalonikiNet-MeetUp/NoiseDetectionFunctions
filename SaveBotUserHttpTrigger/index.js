@@ -22,7 +22,7 @@ function addDevice(context, userid){
   });
 }
 
-function addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, userid){
+function addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, userid, botusername){
   BotInfo.create({
     botid: botid,
     botname: botname,
@@ -31,6 +31,7 @@ function addBotUser(context, botid, botname, serviceurl, conversationid, channel
     channelid: channelid,
     botuserid, botuserid,
     userid, userid,
+    botusername, botusername 
   }).then(botinfoResult => {
       context.res = {
         status: 200
@@ -46,13 +47,13 @@ function addBotUser(context, botid, botname, serviceurl, conversationid, channel
 }
 
 
-function addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid){
+function addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername){
   User.create({
     email: email,
     name: displayName,
     token: token,
   }).then(userResult => {
-      addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, userResult.get('id'));
+      addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, userResult.get('id'), botusername);
       addDevice(context, userResult.get('id'));
   }).catch(error => {
       context.res = {
@@ -107,5 +108,5 @@ module.exports = function (context, req) {
         return;
     }
 
-    addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid);
+    addUser(context, email, displayName, token, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername);
 };
