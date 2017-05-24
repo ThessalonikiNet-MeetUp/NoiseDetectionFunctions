@@ -58,5 +58,6 @@ BotInfo.belongsTo(User, {foreignKey: 'userid'});
 
 module.exports = {
     User: User,
-    Device: Device
+    Device: Device,
+    BotInfo: BotInfo
 }
