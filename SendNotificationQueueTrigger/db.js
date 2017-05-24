@@ -28,7 +28,7 @@ const User = sequelize.define('users', {
   timestamps: false
 });
 
-const BotInfo = sequelize.define('botinfo', {
+const BotInfo = sequelize.define('botinfos', {
   botid: { type: Sequelize.STRING },
   botname: { type: Sequelize.STRING },
   serviceurl: { type: Sequelize.STRING },
