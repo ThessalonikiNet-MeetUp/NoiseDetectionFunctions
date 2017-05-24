@@ -2,6 +2,25 @@ const db = require('../SendNotificationQueueTrigger/db');
 const User = db.User;
 const Device = db.Device;
 
+function addDevice(context, userid){
+  Device.create({
+    name: null,
+    userid: userid,
+  }).then(deviceResult => {
+    context.res = {
+        status: 200,
+        body: deviceResult.get('id')
+    };
+    context.done();
+  }).catch(error => {
+      context.res = {
+          status: 500,
+          body: error
+      };
+      context.log(error);
+  });
+}
+
 module.exports = function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
     context.log(req.body);
@@ -54,22 +73,7 @@ module.exports = function (context, req) {
         conversationid: conversationid,
         channelid: channelid,
     }).then(userResult => {
-        Device.create({
-          name: null,
-          userid: userResult.get('id'),
-        }).then(deviceResult => {
-          context.res = {
-              status: 200,
-              body: deviceResult.get('id')
-          };
-          context.done();
-        }).catch(error => {
-            context.res = {
-                status: 500,
-                body: error
-            };
-            context.log(error);
-        });
+        addDevice(context, userResult.get('id'));
     }).catch(error => {
         context.res = {
             status: 500,
