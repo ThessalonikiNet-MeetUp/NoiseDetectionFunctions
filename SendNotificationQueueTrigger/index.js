@@ -9,6 +9,7 @@ const directLineSpecUrl = 'https://docs.botframework.com/en-us/restapi/directlin
 
 const User = db.User;
 const Device = db.Device;
+const BotInfo = db.BotInfo;
 
 var directLineClient = rp(directLineSpecUrl)
   .then(function (spec) {
@@ -42,12 +43,14 @@ module.exports = function (context, myQueueItem) {
         context.log('error', {source: 'f', message: 'user info could not be retrieved'});
         context.done();
       }
+      context.log('user', response.dataValues.user);
+
       if(device.botinfo === null) {
         context.log('error', {source: 'f', message: 'bot info could not be retrieved'});
         context.done();
       }
+      context.log('botinfo', response.dataValues.botinfo);
 
-      context.log('user id', response.dataValues.user.id);
 
       var botData = {};
       botData.conversationId = response.dataValues.botinfo.dataValues.conversationid;
