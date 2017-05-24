@@ -33,63 +33,69 @@ module.exports = function (context, myQueueItem) {
   Device.find({
     where: {
         id: deviceID
-    }, include: [User, BotInfo]}).then(function(response) {
+        }, include: { model: User, include: { model: BotInfo } }
+      }).then(function(response) {
       if(response === null) {
-        context.log('error', {source: 'f', message: 'device not found'});
+        context.log('error', {source: 'f', message: 'Device not found'});
         context.done();
       }
       var device = response.dataValues;
       if(device.user === null) {
-        context.log('error', {source: 'f', message: 'user info could not be retrieved'});
+        context.log('error', {source: 'f', message: 'User info could not be retrieved'});
         context.done();
       }
       context.log('user', response.dataValues.user);
 
-      if(device.botinfo === null) {
-        context.log('error', {source: 'f', message: 'bot info could not be retrieved'});
+      var botinfos = response.dataValues.user.dataValues.botinfo;
+      if(botinfos === null || (Array.IsArray(botinfos) && botinfos.length === 0)) {
+        context.log('error', {source: 'f', message: 'Bot info could not be retrieved'});
         context.done();
       }
-      context.log('botinfo', response.dataValues.botinfo);
+      context.log('botinfos', botinfos);
 
+      botinfos.each(function(botinfo) {
 
-      var botData = {};
-      botData.conversationId = response.dataValues.botinfo.dataValues.conversationid;
-      botData.channelId = response.dataValues.botinfo.dataValues.channelid;
-      botData.recipientId = response.dataValues.botinfo.dataValues.userid;
-      botData.recipientName = response.dataValues.user.dataValues.name;
-      botData.serviceUrl = response.dataValues.botinfo.dataValues.serviceurl;
+        var botData = {};
+        botData.conversationId = response.dataValues.botinfo.dataValues.conversationid;
+        botData.channelId = response.dataValues.botinfo.dataValues.channelid;
+        botData.recipientId = response.dataValues.botinfo.dataValues.userid;
+        botData.recipientName = response.dataValues.user.dataValues.name;
+        botData.serviceUrl = response.dataValues.botinfo.dataValues.serviceurl;
+        botData.token = response.dataValues.user.dataValues.token;
 
-      context.log('set client', botData);
+        context.log('set client', botData);
 
-      directLineClient.then(function (client) {
-        context.log('start convo');
-        client.Conversations.Conversations_StartConversation()                          // create conversation
-          .then(function (response) {
-              context.log(response.obj.conversationId);
-              return response.obj.conversationId;
-          })                            // obtain id
-          .then(function (conversationId) {
-             context.log(conversationId);
-             context.log('post');
+        directLineClient.then(function (client) {
+            context.log('start convo');
+            client.Conversations.Conversations_StartConversation()                          // create conversation
+            .then(function (response) {
+                context.log(response.obj.conversationId);
+                return response.obj.conversationId;
+            })                            // obtain id
+            .then(function (conversationId) {
+                context.log(conversationId);
+                context.log('post');
 
-             client.Conversations.Conversations_PostActivity(
-             {
-                  conversationId: conversationId,
-                  activity: {
-                      textFormat: 'plain',
-                      text: 'NDBDATA:' + JSON.stringify(botData),
-                      type: 'message',
-                      from: {
-                          id: directLineClientName,
-                          name: directLineClientName
-                      }
-                  }
-              }).catch(function (err) {
-                  context.log('Error sending message:', err);
-              });
-          });
+                client.Conversations.Conversations_PostActivity(
+                {
+                    conversationId: conversationId,
+                    activity: {
+                        textFormat: 'plain',
+                        text: 'NDBDATA:' + JSON.stringify(botData),
+                        type: 'message',
+                        from: {
+                            id: directLineClientName,
+                            name: directLineClientName
+                        }
+                    }
+                }).catch(function (err) {
+                    context.log('Error sending message:', err);
+                    context.done();      
+                });
+            });
+        });
+
       });
-
       context.done();
       
     }, function(error) {

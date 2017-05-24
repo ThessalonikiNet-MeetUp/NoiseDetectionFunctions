@@ -22,7 +22,7 @@ const User = sequelize.define('users', {
   id: { type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true },
   email: { type: Sequelize.STRING },
   name: { type: Sequelize.STRING },
-  token: { type: Sequelize.STRING },
+  token: { type: Sequelize.STRING }
 },
 {
   timestamps: false
@@ -33,10 +33,10 @@ const BotInfo = sequelize.define('botinfos', {
   botname: { type: Sequelize.STRING },
   serviceurl: { type: Sequelize.STRING },
   conversationid: { type: Sequelize.STRING },
-  channelid: { type: Sequelize.STRING },
-  botuserid: { type: Sequelize.STRING },
-  userid: { type: Sequelize.STRING },
-  botusername: { type: Sequelize.STRING },
+  channelid: { type: Sequelize.STRING, primaryKey: true },
+  botuserid: { type: Sequelize.STRING, primaryKey: true },
+  userid: { type: Sequelize.INTEGER },
+  botusername: { type: Sequelize.STRING }
 },
 {
   timestamps: false
