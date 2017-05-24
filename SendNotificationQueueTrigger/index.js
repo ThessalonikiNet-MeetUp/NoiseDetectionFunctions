@@ -9,6 +9,7 @@ const directLineSpecUrl = 'https://docs.botframework.com/en-us/restapi/directlin
 
 const User = db.User;
 const Device = db.Device;
+const BotInfo = db.BotInfo;
 
 var directLineClient = rp(directLineSpecUrl)
   .then(function (spec) {
@@ -32,7 +33,7 @@ module.exports = function (context, myQueueItem) {
   Device.find({
     where: {
         id: deviceID
-    }, include: [User]}).then(function(response) {
+    }, include: [User, BotInfo]}).then(function(response) {
       if(response === null) {
         context.log('error', {source: 'f', message: 'device not found'});
         context.done();
@@ -42,15 +43,21 @@ module.exports = function (context, myQueueItem) {
         context.log('error', {source: 'f', message: 'user info could not be retrieved'});
         context.done();
       }
+      context.log('user', response.dataValues.user);
 
-      context.log('user id', response.dataValues.user.id);
+      if(device.botinfo === null) {
+        context.log('error', {source: 'f', message: 'bot info could not be retrieved'});
+        context.done();
+      }
+      context.log('botinfo', response.dataValues.botinfo);
+
 
       var botData = {};
-      botData.conversationId = response.dataValues.user.dataValues.conversationid;
-      botData.channelId = response.dataValues.user.dataValues.channelid;
-      botData.recipientId = response.dataValues.user.dataValues.userid;
+      botData.conversationId = response.dataValues.botinfo.dataValues.conversationid;
+      botData.channelId = response.dataValues.botinfo.dataValues.channelid;
+      botData.recipientId = response.dataValues.botinfo.dataValues.userid;
       botData.recipientName = response.dataValues.user.dataValues.name;
-      botData.serviceUrl = response.dataValues.user.dataValues.serviceurl;
+      botData.serviceUrl = response.dataValues.botinfo.dataValues.serviceurl;
 
       context.log('set client', botData);
 
