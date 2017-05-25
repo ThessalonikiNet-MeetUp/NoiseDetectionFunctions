@@ -34,7 +34,9 @@ function addUser(context, email, displayName, token, botid, botname, serviceurl,
           userid = user.get('id');
           username = user.get('name');
           if (!created) {
-            return [200, username];
+            return user.updateAttributes({ token: token }).then(() => {
+                return [200, username];
+            });
           } 
 
           return addBotUser(context, botid, botname, serviceurl, conversationid, channelid, botuserid, botusername, userid)
