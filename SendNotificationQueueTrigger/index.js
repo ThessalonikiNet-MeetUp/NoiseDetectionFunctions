@@ -46,7 +46,7 @@ module.exports = function (context, myQueueItem) {
       }
       context.log('user', response.dataValues.user);
 
-      var botinfos = response.dataValues.user.dataValues.botinfo;
+      var botinfos = response.dataValues.user.dataValues.botinfos;
       if(botinfos === null || (Array.IsArray(botinfos) && botinfos.length === 0)) {
         context.log('error', {source: 'f', message: 'Bot info could not be retrieved'});
         context.done();
