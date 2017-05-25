@@ -98,7 +98,7 @@ module.exports = function (context, myQueueItem) {
             });
         });
 
-      });
+      }
       context.done();
       
     }, function(error) {
