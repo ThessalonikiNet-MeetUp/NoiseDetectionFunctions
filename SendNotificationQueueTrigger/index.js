@@ -44,24 +44,27 @@ module.exports = function (context, myQueueItem) {
         context.log('error', {source: 'f', message: 'User info could not be retrieved'});
         context.done();
       }
-      context.log('user', response.dataValues.user);
+      var user = response.dataValues.user.dataValues;
+      context.log('user', user);
 
-      var botinfos = response.dataValues.user.dataValues.botinfos;
+      var botinfos = user.botinfos;
       if(botinfos === null || (Array.IsArray(botinfos) && botinfos.length === 0)) {
         context.log('error', {source: 'f', message: 'Bot info could not be retrieved'});
         context.done();
       }
       context.log('botinfos', botinfos);
 
-      botinfos.each(function(botinfo) {
+      var i = 0;
+      for(i = 0; i<botinfos.length; i++) {
+        var botinfo = botinfos[i].dataValues;
 
         var botData = {};
-        botData.conversationId = botinfo.dataValues.conversationid;
-        botData.channelId = botinfo.dataValues.channelid;
-        botData.recipientId = botinfo.dataValues.userid;
-        botData.recipientName = user.dataValues.name;
-        botData.serviceUrl = botinfo.dataValues.serviceurl;
-        botData.token = user.dataValues.token;
+        botData.conversationId = botinfo.conversationid;
+        botData.channelId = botinfo.channelid;
+        botData.recipientId = botinfo.userid;
+        botData.recipientName = user.name;
+        botData.serviceUrl = botinfo.serviceurl;
+        botData.token = user.token;
 
         context.log('set client', botData);
 
