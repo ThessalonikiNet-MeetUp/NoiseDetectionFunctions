@@ -84,7 +84,7 @@ module.exports = function (context, myQueueItem) {
                       conversationId: conversationId,
                       activity: {
                           textFormat: 'plain',
-                          text: 'NDBDATA:' + JSON.stringify(botData),
+                          text: 'NDBDATA;' + JSON.stringify(botData),
                           type: 'message',
                           from: {
                               id: directLineClientName,
