@@ -56,12 +56,12 @@ module.exports = function (context, myQueueItem) {
       botinfos.each(function(botinfo) {
 
         var botData = {};
-        botData.conversationId = response.dataValues.botinfo.dataValues.conversationid;
-        botData.channelId = response.dataValues.botinfo.dataValues.channelid;
-        botData.recipientId = response.dataValues.botinfo.dataValues.userid;
-        botData.recipientName = response.dataValues.user.dataValues.name;
-        botData.serviceUrl = response.dataValues.botinfo.dataValues.serviceurl;
-        botData.token = response.dataValues.user.dataValues.token;
+        botData.conversationId = botinfo.dataValues.conversationid;
+        botData.channelId = botinfo.dataValues.channelid;
+        botData.recipientId = botinfo.dataValues.userid;
+        botData.recipientName = user.dataValues.name;
+        botData.serviceUrl = botinfo.dataValues.serviceurl;
+        botData.token = user.dataValues.token;
 
         context.log('set client', botData);
 
