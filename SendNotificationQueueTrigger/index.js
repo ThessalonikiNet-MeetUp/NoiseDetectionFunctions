@@ -44,59 +44,64 @@ module.exports = function (context, myQueueItem) {
         context.log('error', {source: 'f', message: 'User info could not be retrieved'});
         context.done();
       }
-      context.log('user', response.dataValues.user);
+      var user = response.dataValues.user.dataValues;
+      context.log('user', user);
 
-      var botinfos = response.dataValues.user.dataValues.botinfo;
-      if(botinfos === null || (Array.IsArray(botinfos) && botinfos.length === 0)) {
+      var botinfos = user.botinfos;
+      if(botinfos === null || botinfos.length === 0) {
         context.log('error', {source: 'f', message: 'Bot info could not be retrieved'});
         context.done();
+      } else {
+        context.log('botinfos', botinfos);
+
+        var i = 0;
+        for(i = 0; i<botinfos.length; i++) {
+          var botinfo = botinfos[i].dataValues;
+
+          var botData = {};
+          botData.conversationId = botinfo.conversationid;
+          botData.channelId = botinfo.channelid;
+          botData.recipientId = '' + botinfo.userid;
+          botData.recipientName = user.name;
+          botData.serviceUrl = botinfo.serviceurl;
+          botData.token = user.token;
+
+          context.log('set client', botData);
+
+          directLineClient.then(function (client) {
+              context.log('start convo');
+              client.Conversations.Conversations_StartConversation()                          // create conversation
+              .then(function (response) {
+                  context.log(response.obj.conversationId);
+                  return response.obj.conversationId;
+              })                            // obtain id
+              .then(function (conversationId) {
+                  context.log(conversationId);
+                  context.log('post');
+
+                  client.Conversations.Conversations_PostActivity(
+                  {
+                      conversationId: conversationId,
+                      activity: {
+                          textFormat: 'plain',
+                          text: 'NDBDATA;' + JSON.stringify(botData),
+                          type: 'message',
+                          from: {
+                              id: directLineClientName,
+                              name: directLineClientName
+                          }
+                      }
+                  }).catch(function (err) {
+                      context.log('Error sending message:', err);
+                      context.done();      
+                  });
+              });
+          });
+
+        }
+        context.done();
+
       }
-      context.log('botinfos', botinfos);
-
-      botinfos.each(function(botinfo) {
-
-        var botData = {};
-        botData.conversationId = response.dataValues.botinfo.dataValues.conversationid;
-        botData.channelId = response.dataValues.botinfo.dataValues.channelid;
-        botData.recipientId = response.dataValues.botinfo.dataValues.userid;
-        botData.recipientName = response.dataValues.user.dataValues.name;
-        botData.serviceUrl = response.dataValues.botinfo.dataValues.serviceurl;
-        botData.token = response.dataValues.user.dataValues.token;
-
-        context.log('set client', botData);
-
-        directLineClient.then(function (client) {
-            context.log('start convo');
-            client.Conversations.Conversations_StartConversation()                          // create conversation
-            .then(function (response) {
-                context.log(response.obj.conversationId);
-                return response.obj.conversationId;
-            })                            // obtain id
-            .then(function (conversationId) {
-                context.log(conversationId);
-                context.log('post');
-
-                client.Conversations.Conversations_PostActivity(
-                {
-                    conversationId: conversationId,
-                    activity: {
-                        textFormat: 'plain',
-                        text: 'NDBDATA:' + JSON.stringify(botData),
-                        type: 'message',
-                        from: {
-                            id: directLineClientName,
-                            name: directLineClientName
-                        }
-                    }
-                }).catch(function (err) {
-                    context.log('Error sending message:', err);
-                    context.done();      
-                });
-            });
-        });
-
-      });
-      context.done();
       
     }, function(error) {
         context.log('error', error);

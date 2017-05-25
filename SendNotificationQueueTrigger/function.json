@@ -4,7 +4,7 @@
       "name": "myQueueItem",
       "type": "queueTrigger",
       "direction": "in",
-      "queueName": "ndbqueue",
+      "queueName": "ndbqueuefunction",
       "connection": "ndbstorage_STORAGE"
     }
   ],

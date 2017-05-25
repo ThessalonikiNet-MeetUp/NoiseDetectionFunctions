@@ -14,7 +14,7 @@
     {
       "type": "queue",
       "name": "nbdDeviceID",
-      "queueName": "ndbqueue",
+      "queueName": "ndbqueuefunction",
       "connection": "ndbstorage_STORAGE",
       "direction": "out"
     }
